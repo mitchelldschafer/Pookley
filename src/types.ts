@@ -10,7 +10,7 @@ export interface App {
   sourceUrl?: string;
   thumbnail: string;
   usage?: number;
-  tier: 'free' | 'pro' | 'premium';
+  tier: 'free' | 'pro' | 'premium' | 'enterprise';
   featured?: boolean;
 }
 

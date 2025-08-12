@@ -29,7 +29,8 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => 
   const tierConfig = {
     free: { label: 'Free', color: 'text-gray-600', bg: 'bg-gray-100 dark:bg-gray-800' },
     pro: { label: 'Pro', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-    premium: { label: 'Premium', color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' }
+    premium: { label: 'Premium', color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+    enterprise: { label: 'Enterprise', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' }
   };
 
   const status = statusConfig[app.status];
@@ -38,7 +39,8 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => 
 
   const hasAccess = userTier === 'premium' || 
                    (userTier === 'pro' && app.tier !== 'premium') || 
-                   (userTier === 'free' && app.tier === 'free');
+                   (userTier === 'free' && app.tier === 'free') ||
+                   (userTier === 'premium' && app.tier === 'enterprise');
 
   if (viewMode === 'list') {
     return (
