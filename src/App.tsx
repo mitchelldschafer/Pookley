@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, Grid, List, Sun, Moon, Download, Shuffle, Filter, Calendar, Code, Activity, Crown, Star, Lock } from 'lucide-react';
+import { Search, Plus, Grid, List, Sun, Moon, Download, Shuffle, Filter, Calendar, Code, Activity, Crown, Star, Lock, ChevronDown, Users, FileText, DollarSign, BarChart3, MessageSquare, Calendar as CalendarIcon, Package, Settings } from 'lucide-react';
 import { AppCard } from './components/AppCard';
 import { PricingModal } from './components/PricingModal';
 import { StatsWidget } from './components/StatsWidget';
@@ -15,6 +15,70 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [userTier, setUserTier] = useState<'free' | 'pro' | 'premium'>('free');
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const businessTools = {
+    crm: {
+      title: 'CRM & Sales',
+      icon: Users,
+      tools: [
+        { name: 'Customer Management', description: 'Manage contacts and leads', url: '#' },
+        { name: 'Sales Pipeline', description: 'Track deals and opportunities', url: '#' },
+        { name: 'Lead Generation', description: 'Capture and nurture leads', url: '#' },
+        { name: 'Contact Database', description: 'Centralized contact management', url: '#' }
+      ]
+    },
+    finance: {
+      title: 'Finance & Billing',
+      icon: DollarSign,
+      tools: [
+        { name: 'Invoice Generator', description: 'Create professional invoices', url: '#' },
+        { name: 'Expense Tracking', description: 'Monitor business expenses', url: '#' },
+        { name: 'Payment Processing', description: 'Accept online payments', url: '#' },
+        { name: 'Financial Reports', description: 'Track revenue and profits', url: '#' }
+      ]
+    },
+    analytics: {
+      title: 'Analytics & Reports',
+      icon: BarChart3,
+      tools: [
+        { name: 'Business Dashboard', description: 'Real-time business metrics', url: '#' },
+        { name: 'Sales Analytics', description: 'Track sales performance', url: '#' },
+        { name: 'Customer Insights', description: 'Understand customer behavior', url: '#' },
+        { name: 'ROI Calculator', description: 'Measure return on investment', url: '#' }
+      ]
+    },
+    communication: {
+      title: 'Communication',
+      icon: MessageSquare,
+      tools: [
+        { name: 'Email Marketing', description: 'Send targeted campaigns', url: '#' },
+        { name: 'Live Chat', description: 'Real-time customer support', url: '#' },
+        { name: 'Team Messaging', description: 'Internal communication', url: '#' },
+        { name: 'Video Conferencing', description: 'Virtual meetings', url: '#' }
+      ]
+    },
+    productivity: {
+      title: 'Productivity',
+      icon: CalendarIcon,
+      tools: [
+        { name: 'Project Management', description: 'Organize tasks and projects', url: '#' },
+        { name: 'Time Tracking', description: 'Monitor work hours', url: '#' },
+        { name: 'Document Management', description: 'Store and share files', url: '#' },
+        { name: 'Calendar Scheduling', description: 'Manage appointments', url: '#' }
+      ]
+    },
+    inventory: {
+      title: 'Inventory & Orders',
+      icon: Package,
+      tools: [
+        { name: 'Inventory Management', description: 'Track stock levels', url: '#' },
+        { name: 'Order Processing', description: 'Manage customer orders', url: '#' },
+        { name: 'Supplier Management', description: 'Manage vendor relationships', url: '#' },
+        { name: 'Warehouse Management', description: 'Optimize storage', url: '#' }
+      ]
+    }
+  };
 
   const categories: { value: Category | 'all'; label: string; color: string }[] = [
     { value: 'all', label: 'All Apps', color: 'bg-blue-500' },
@@ -112,6 +176,24 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDropdownToggle = (dropdown: string) => {
+    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
+  const handleToolClick = (url: string) => {
+    if (url !== '#') {
+      window.open(url, '_blank');
+    }
+    setActiveDropdown(null);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setActiveDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const getTierBadge = () => {
     const badges = {
       free: { label: 'Free', color: 'bg-gray-500', icon: null },
@@ -135,7 +217,7 @@ function App() {
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -144,10 +226,57 @@ function App() {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Pookley
                 </h1>
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Business</span>
               </div>
               {getTierBadge()}
             </div>
 
+            {/* Business Tools Navigation */}
+            <nav className="hidden lg:flex items-center space-x-1">
+              {Object.entries(businessTools).map(([key, tool]) => {
+                const Icon = tool.icon;
+                return (
+                  <div key={key} className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDropdownToggle(key);
+                      }}
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        activeDropdown === key
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{tool.title}</span>
+                      <ChevronDown className={`w-3 h-3 transition-transform ${
+                        activeDropdown === key ? 'rotate-180' : ''
+                      }`} />
+                    </button>
+                    
+                    {activeDropdown === key && (
+                      <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50">
+                        {tool.tools.map((item, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleToolClick(item.url)}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                              {item.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {item.description}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowPricingModal(true)}
@@ -196,13 +325,13 @@ function App() {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl sm:text-6xl font-bold mb-6">
-            Premium Apps
+            All-in-One Business
             <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Built for You
+              App Marketplace
             </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            Access a curated collection of professional-grade applications. From productivity tools to creative utilities, everything you need in one subscription.
+            Everything your business needs in one platform. CRM, invoicing, analytics, communication tools, and more. All integrated and ready to use.
           </p>
           
           {userTier === 'free' && (
@@ -212,7 +341,7 @@ function App() {
                 <span className="font-semibold text-gray-900 dark:text-gray-100">Limited Access</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                You're currently on the free plan. Upgrade to unlock all premium apps and features.
+                You're currently on the free plan. Upgrade to unlock all business tools and premium features.
               </p>
               <button
                 onClick={() => setShowPricingModal(true)}
@@ -228,7 +357,7 @@ function App() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search apps, technologies, or descriptions..."
+                placeholder="Search business tools, apps, or features..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -328,12 +457,12 @@ function App() {
                 <span className="text-xl font-bold text-gray-800 dark:text-gray-200">Pookley</span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-                Premium applications crafted with attention to detail. Join thousands of users who trust Pookley for their daily productivity and creative needs.
+                Complete business solutions crafted with attention to detail. Join thousands of businesses who trust Pookley for their daily operations and growth.
               </p>
               <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Activity className="w-4 h-4" />
-                  <span>{apps.length} Apps Available</span>
+                  <span>{apps.length} Business Tools</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4" />
@@ -343,12 +472,12 @@ function App() {
             </div>
             
             <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Product</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Business Tools</h3>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Changelog</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Roadmap</a></li>
+                <li><a href="#" className="hover:text-blue-500 transition-colors">CRM & Sales</a></li>
+                <li><a href="#" className="hover:text-blue-500 transition-colors">Finance & Billing</a></li>
+                <li><a href="#" className="hover:text-blue-500 transition-colors">Analytics</a></li>
+                <li><a href="#" className="hover:text-blue-500 transition-colors">Communication</a></li>
               </ul>
             </div>
             
