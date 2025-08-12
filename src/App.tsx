@@ -1,511 +1,171 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, Grid, List, Sun, Moon, Download, Shuffle, Filter, Calendar, Code, Activity, Crown, Star, Lock, ChevronDown, Users, FileText, DollarSign, BarChart3, MessageSquare, Calendar as CalendarIcon, Package, Settings } from 'lucide-react';
-import { AppCard } from './components/AppCard';
-import { PricingModal } from './components/PricingModal';
-import { StatsWidget } from './components/StatsWidget';
-import { sampleApps } from './data/sampleApps';
-import type { App, Category, SortOption } from './types';
+import type { App } from '../types';
 
-function App() {
-  const [apps, setApps] = useState<App[]>(sampleApps);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [darkMode, setDarkMode] = useState(false);
-  const [showPricingModal, setShowPricingModal] = useState(false);
-  const [userTier, setUserTier] = useState<'free' | 'pro' | 'premium'>('free');
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-
-  const businessTools = {
-    crm: {
-      title: 'CRM & Sales',
-      icon: Users,
-      tools: [
-        { name: 'Customer Management', description: 'Manage contacts and leads', url: '#' },
-        { name: 'Sales Pipeline', description: 'Track deals and opportunities', url: '#' },
-        { name: 'Lead Generation', description: 'Capture and nurture leads', url: '#' },
-        { name: 'Contact Database', description: 'Centralized contact management', url: '#' }
-      ]
-    },
-    finance: {
-      title: 'Finance & Billing',
-      icon: DollarSign,
-      tools: [
-        { name: 'Invoice Generator', description: 'Create professional invoices', url: '#' },
-        { name: 'Expense Tracking', description: 'Monitor business expenses', url: '#' },
-        { name: 'Payment Processing', description: 'Accept online payments', url: '#' },
-        { name: 'Financial Reports', description: 'Track revenue and profits', url: '#' }
-      ]
-    },
-    analytics: {
-      title: 'Analytics & Reports',
-      icon: BarChart3,
-      tools: [
-        { name: 'Business Dashboard', description: 'Real-time business metrics', url: '#' },
-        { name: 'Sales Analytics', description: 'Track sales performance', url: '#' },
-        { name: 'Customer Insights', description: 'Understand customer behavior', url: '#' },
-        { name: 'ROI Calculator', description: 'Measure return on investment', url: '#' }
-      ]
-    },
-    communication: {
-      title: 'Communication',
-      icon: MessageSquare,
-      tools: [
-        { name: 'Email Marketing', description: 'Send targeted campaigns', url: '#' },
-        { name: 'Live Chat', description: 'Real-time customer support', url: '#' },
-        { name: 'Team Messaging', description: 'Internal communication', url: '#' },
-        { name: 'Video Conferencing', description: 'Virtual meetings', url: '#' }
-      ]
-    },
-    productivity: {
-      title: 'Productivity',
-      icon: CalendarIcon,
-      tools: [
-        { name: 'Project Management', description: 'Organize tasks and projects', url: '#' },
-        { name: 'Time Tracking', description: 'Monitor work hours', url: '#' },
-        { name: 'Document Management', description: 'Store and share files', url: '#' },
-        { name: 'Calendar Scheduling', description: 'Manage appointments', url: '#' }
-      ]
-    },
-    inventory: {
-      title: 'Inventory & Orders',
-      icon: Package,
-      tools: [
-        { name: 'Inventory Management', description: 'Track stock levels', url: '#' },
-        { name: 'Order Processing', description: 'Manage customer orders', url: '#' },
-        { name: 'Supplier Management', description: 'Manage vendor relationships', url: '#' },
-        { name: 'Warehouse Management', description: 'Optimize storage', url: '#' }
-      ]
-    }
-  };
-
-  const categories: { value: Category | 'all'; label: string; color: string }[] = [
-    { value: 'all', label: 'All Apps', color: 'bg-blue-500' },
-    { value: 'productivity', label: 'Productivity', color: 'bg-green-500' },
-    { value: 'games', label: 'Games', color: 'bg-purple-500' },
-    { value: 'utilities', label: 'Utilities', color: 'bg-orange-500' },
-    { value: 'tools', label: 'Tools', color: 'bg-red-500' },
-    { value: 'design', label: 'Design', color: 'bg-pink-500' },
-    { value: 'security', label: 'Security', color: 'bg-yellow-500' },
-    { value: 'lifestyle', label: 'Lifestyle', color: 'bg-indigo-500' },
-    { value: 'development', label: 'Development', color: 'bg-cyan-500' },
-  ];
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('pookley-theme');
-    const savedViewMode = localStorage.getItem('pookley-view-mode');
-    const savedUserTier = localStorage.getItem('pookley-user-tier');
-    
-    if (savedTheme) {
-      setDarkMode(savedTheme === 'dark');
-    }
-    if (savedViewMode) {
-      setViewMode(savedViewMode as 'grid' | 'list');
-    }
-    if (savedUserTier) {
-      setUserTier(savedUserTier as 'free' | 'pro' | 'premium');
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('pookley-theme', darkMode ? 'dark' : 'light');
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  useEffect(() => {
-    localStorage.setItem('pookley-view-mode', viewMode);
-  }, [viewMode]);
-
-  useEffect(() => {
-    localStorage.setItem('pookley-user-tier', userTier);
-  }, [userTier]);
-
-  const filteredAndSortedApps = useMemo(() => {
-    let filtered = apps.filter(app => {
-      const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           app.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           app.technologies.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      const matchesCategory = selectedCategory === 'all' || app.category === selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    });
-
-    return filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
-        case 'oldest':
-          return new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'mostUsed':
-          return (b.usage || 0) - (a.usage || 0);
-        default:
-          return 0;
-      }
-    });
-  }, [apps, searchTerm, selectedCategory, sortBy]);
-
-  const handleRandomApp = () => {
-    const accessibleApps = filteredAndSortedApps.filter(app => 
-      userTier === 'premium' || 
-      (userTier === 'pro' && app.tier !== 'premium') || 
-      (userTier === 'free' && app.tier === 'free')
-    );
-    
-    if (accessibleApps.length > 0) {
-      const randomApp = accessibleApps[Math.floor(Math.random() * accessibleApps.length)];
-      window.open(randomApp.liveUrl, '_blank');
-    }
-  };
-
-  const exportApps = () => {
-    const dataStr = JSON.stringify(apps, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'pookley-apps.json';
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDropdownToggle = (dropdown: string) => {
-    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
-  };
-
-  const handleToolClick = (url: string) => {
-    if (url !== '#') {
-      window.open(url, '_blank');
-    }
-    setActiveDropdown(null);
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setActiveDropdown(null);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
-  const getTierBadge = () => {
-    const badges = {
-      free: { label: 'Free', color: 'bg-gray-500', icon: null },
-      pro: { label: 'Pro', color: 'bg-blue-500', icon: Star },
-      premium: { label: 'Premium', color: 'bg-gradient-to-r from-yellow-400 to-orange-500', icon: Crown }
-    };
-    
-    const badge = badges[userTier];
-    const Icon = badge.icon;
-    
-    return (
-      <div className={`px-3 py-1 rounded-full text-white text-sm font-medium flex items-center space-x-1 ${badge.color}`}>
-        {Icon && <Icon className="w-4 h-4" />}
-        <span>{badge.label}</span>
-      </div>
-    );
-  };
-
-  return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Code className="w-4 h-4 text-white" />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Pookley
-                </h1>
-                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Business</span>
-              </div>
-              {getTierBadge()}
-            </div>
-
-            {/* Business Tools Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              {Object.entries(businessTools).map(([key, tool]) => {
-                const Icon = tool.icon;
-                return (
-                  <div key={key} className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDropdownToggle(key);
-                      }}
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        activeDropdown === key
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{tool.title}</span>
-                      <ChevronDown className={`w-3 h-3 transition-transform ${
-                        activeDropdown === key ? 'rotate-180' : ''
-                      }`} />
-                    </button>
-                    
-                    {activeDropdown === key && (
-                      <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50">
-                        {tool.tools.map((item, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleToolClick(item.url)}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                              {item.name}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              {item.description}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowPricingModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 text-sm font-medium"
-              >
-                {userTier === 'free' ? 'Upgrade' : 'Manage Plan'}
-              </button>
-              
-              <button
-                onClick={handleRandomApp}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
-                title="Random App"
-              >
-                <Shuffle className="w-5 h-5" />
-              </button>
-              
-              <button
-                onClick={exportApps}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
-                title="Export Apps"
-              >
-                <Download className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
-                title="Toggle View"
-              >
-                {viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid className="w-5 h-5" />}
-              </button>
-
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
-                title="Toggle Theme"
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl sm:text-6xl font-bold mb-6">
-            All-in-One Business
-            <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              App Marketplace
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            Everything your business needs in one platform. CRM, invoicing, analytics, communication tools, and more. All integrated and ready to use.
-          </p>
-          
-          {userTier === 'free' && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700 max-w-md mx-auto">
-              <div className="flex items-center justify-center space-x-2 mb-3">
-                <Lock className="w-5 h-5 text-yellow-500" />
-                <span className="font-semibold text-gray-900 dark:text-gray-100">Limited Access</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                You're currently on the free plan. Upgrade to unlock all business tools and premium features.
-              </p>
-              <button
-                onClick={() => setShowPricingModal(true)}
-                className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-medium"
-              >
-                View Plans
-              </button>
-            </div>
-          )}
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto mb-12">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search business tools, apps, or features..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="name">A-Z</option>
-                <option value="mostUsed">Most Popular</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Category Filters */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {categories.map(({ value, label, color }) => (
-              <button
-                key={value}
-                onClick={() => setSelectedCategory(value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all transform hover:scale-105 ${
-                  selectedCategory === value
-                    ? `${color} text-white shadow-lg`
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Widgets */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <StatsWidget apps={apps} userTier={userTier} />
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        {filteredAndSortedApps.length === 0 ? (
-          <div className="text-center py-20">
-            <Filter className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
-              No apps found
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Try adjusting your search terms or filters
-            </p>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('all');
-              }}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-            >
-              Clear Filters
-            </button>
-          </div>
-        ) : (
-          <div className={`grid gap-6 ${
-            viewMode === 'grid'
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-              : 'grid-cols-1 max-w-4xl mx-auto'
-          }`}>
-            {filteredAndSortedApps.map((app) => (
-              <AppCard key={app.id} app={app} viewMode={viewMode} userTier={userTier} />
-            ))}
-          </div>
-        )}
-      </main>
-
-      {/* Pricing Modal */}
-      {showPricingModal && (
-        <PricingModal
-          onClose={() => setShowPricingModal(false)}
-          currentTier={userTier}
-          onTierChange={setUserTier}
-        />
-      )}
-
-      {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Code className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-800 dark:text-gray-200">Pookley</span>
-              </div>
-              <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-                Complete business solutions crafted with attention to detail. Join thousands of businesses who trust Pookley for their daily operations and growth.
-              </p>
-              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center space-x-2">
-                  <Activity className="w-4 h-4" />
-                  <span>{apps.length} Business Tools</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>Updated Weekly</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Business Tools</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="#" className="hover:text-blue-500 transition-colors">CRM & Sales</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Finance & Billing</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Communication</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Support</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-blue-500 transition-colors">Status</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              © 2024 Pookley. All rights reserved.
-            </p>
-            <div className="flex items-center space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">Privacy</a>
-              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">Terms</a>
-              <a href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">Cookies</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-export default App;
+export const sampleApps: App[] = [
+  {
+    id: '1',
+    name: 'TaskFlow Manager',
+    description: 'A powerful task management app with drag-and-drop boards, deadlines, and team collaboration features.',
+    technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-15',
+    liveUrl: 'https://taskflow-demo.com',
+    sourceUrl: 'https://github.com/user/taskflow',
+    thumbnail: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 145,
+    tier: 'pro',
+    featured: true
+  },
+  {
+    id: '2',
+    name: 'Weather Dashboard',
+    description: 'Beautiful weather app with detailed forecasts, interactive maps, and location-based alerts.',
+    technologies: ['JavaScript', 'CSS3', 'OpenWeather API'],
+    category: 'utilities',
+    status: 'active',
+    lastUpdated: '2024-01-10',
+    liveUrl: 'https://weather-dash.com',
+    sourceUrl: 'https://github.com/user/weather-dashboard',
+    thumbnail: 'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 98,
+    tier: 'free'
+  },
+  {
+    id: '3',
+    name: 'Expense Tracker Pro',
+    description: 'Smart expense tracking with automated categorization, budget alerts, and detailed analytics.',
+    technologies: ['Vue.js', 'Chart.js', 'Express.js', 'MongoDB'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-12',
+    liveUrl: 'https://expense-tracker-pro.com',
+    thumbnail: 'https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 76,
+    tier: 'premium',
+    featured: true
+  },
+  {
+    id: '4',
+    name: 'Retro Game Collection',
+    description: 'A collection of classic mini-games including Snake, Tetris, and Pac-Man built with HTML5 Canvas.',
+    technologies: ['HTML5 Canvas', 'JavaScript', 'Web Audio API'],
+    category: 'games',
+    status: 'active',
+    lastUpdated: '2024-01-08',
+    liveUrl: 'https://retro-games.com',
+    sourceUrl: 'https://github.com/user/retro-games',
+    thumbnail: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 203,
+    tier: 'free'
+  },
+  {
+    id: '5',
+    name: 'API Documentation Hub',
+    description: 'Interactive API documentation tool with live testing, code generation, and team collaboration.',
+    technologies: ['Next.js', 'Swagger', 'Prism.js', 'Vercel'],
+    category: 'tools',
+    status: 'development',
+    lastUpdated: '2024-01-14',
+    liveUrl: 'https://api-docs-hub.com',
+    sourceUrl: 'https://github.com/user/api-docs',
+    thumbnail: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 34,
+    tier: 'pro'
+  },
+  {
+    id: '6',
+    name: 'Color Palette Generator',
+    description: 'Generate beautiful color palettes with AI assistance, export to various formats, and save favorites.',
+    technologies: ['CSS3', 'JavaScript', 'Color Theory API'],
+    category: 'design',
+    status: 'active',
+    lastUpdated: '2024-01-11',
+    liveUrl: 'https://color-palette-gen.com',
+    thumbnail: 'https://images.pexels.com/photos/1292241/pexels-photo-1292241.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 127,
+    tier: 'pro',
+    featured: true
+  },
+  {
+    id: '7',
+    name: 'SecurePass Generator',
+    description: 'Advanced password generator with customizable rules, strength analysis, and secure storage options.',
+    technologies: ['Vanilla JS', 'Web Crypto API', 'PWA'],
+    category: 'security',
+    status: 'active',
+    lastUpdated: '2024-01-09',
+    liveUrl: 'https://securepass-gen.com',
+    sourceUrl: 'https://github.com/user/password-gen',
+    thumbnail: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 89,
+    tier: 'free'
+  },
+  {
+    id: '8',
+    name: 'Habit Tracker',
+    description: 'Build better habits with streaks, reminders, analytics, and motivational challenges.',
+    technologies: ['React', 'Redux', 'Chart.js', 'Firebase'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-13',
+    liveUrl: 'https://habit-tracker.com',
+    thumbnail: 'https://images.pexels.com/photos/6147094/pexels-photo-6147094.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 156,
+    tier: 'premium'
+  },
+  {
+    id: '9',
+    name: 'Recipe Organizer',
+    description: 'Organize your recipes with smart categorization, meal planning, and shopping list generation.',
+    technologies: ['PHP', 'MySQL', 'Bootstrap', 'jQuery'],
+    category: 'lifestyle',
+    status: 'archived',
+    lastUpdated: '2023-12-20',
+    liveUrl: 'https://recipe-organizer.com',
+    thumbnail: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 45,
+    tier: 'free'
+  },
+  {
+    id: '10',
+    name: 'Code Snippet Manager',
+    description: 'Organize and share code snippets with syntax highlighting, tags, and team collaboration features.',
+    technologies: ['Node.js', 'Express', 'MongoDB', 'Prism.js'],
+    category: 'development',
+    status: 'development',
+    lastUpdated: '2024-01-16',
+    liveUrl: 'https://code-snippets.com',
+    sourceUrl: 'https://github.com/user/snippet-manager',
+    thumbnail: 'https://images.pexels.com/photos/4164418/pexels-photo-4164418.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 67,
+    tier: 'premium'
+  },
+  {
+    id: '11',
+    name: 'Markdown Editor Pro',
+    description: 'Feature-rich markdown editor with live preview, export options, and collaborative editing.',
+    technologies: ['React', 'CodeMirror', 'Electron', 'Node.js'],
+    category: 'tools',
+    status: 'active',
+    lastUpdated: '2024-01-07',
+    liveUrl: 'https://md-editor-pro.com',
+    thumbnail: 'https://images.pexels.com/photos/261662/pexels-photo-261662.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 112,
+    tier: 'pro'
+  },
+  {
+    id: '12',
+    name: 'Focus Timer',
+    description: 'Pomodoro timer with ambient sounds, productivity analytics, and customizable work/break intervals.',
+    technologies: ['React', 'Web Audio API', 'LocalStorage'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-05',
+    liveUrl: 'https://focus-timer.com',
+    sourceUrl: 'https://github.com/user/focus-timer',
+    thumbnail: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 189,
+    tier: 'premium',
+    featured: true
+  }
+];
