@@ -1,34 +1,4 @@
-          {/* Invoicing and Payment Section */}
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Invoicing & Payment Solutions
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Complete financial management tools for your business
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
-                  Core Business Tools
-                </div>
-              </div>
-            </div>
-            
-            {/* Placeholder for invoicing apps */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Receipt className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Invoicing & Payment Tools Coming Soon
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-                Professional invoicing, payment processing, expense tracking, and financial reporting tools will be available here.
-              </p>
-            </div>
-          </div>
+import type { App } from '../types';
 
 export const sampleApps: App[] = [
   {
@@ -197,5 +167,49 @@ export const sampleApps: App[] = [
     usage: 189,
     tier: 'premium',
     featured: true
+  }
+];
+
+export const invoicingApps: App[] = [
+  {
+    id: 'inv-1',
+    name: 'InvoicePro',
+    description: 'Professional invoicing software with automated billing, payment tracking, and client management.',
+    technologies: ['React', 'Node.js', 'PostgreSQL', 'Stripe API'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-18',
+    liveUrl: 'https://invoicepro.com',
+    sourceUrl: 'https://github.com/user/invoicepro',
+    thumbnail: 'https://images.pexels.com/photos/6863183/pexels-photo-6863183.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 234,
+    tier: 'premium',
+    featured: true
+  },
+  {
+    id: 'inv-2',
+    name: 'QuickBill',
+    description: 'Simple and fast invoicing tool for freelancers and small businesses with PDF export.',
+    technologies: ['Vue.js', 'Express.js', 'SQLite', 'jsPDF'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-16',
+    liveUrl: 'https://quickbill.app',
+    thumbnail: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 156,
+    tier: 'free'
+  },
+  {
+    id: 'inv-3',
+    name: 'BillTracker Enterprise',
+    description: 'Enterprise-grade billing solution with multi-currency support, advanced reporting, and API integration.',
+    technologies: ['Angular', 'Spring Boot', 'MySQL', 'Docker'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-20',
+    liveUrl: 'https://billtracker-enterprise.com',
+    thumbnail: 'https://images.pexels.com/photos/7681091/pexels-photo-7681091.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 89,
+    tier: 'enterprise'
   }
 ];
