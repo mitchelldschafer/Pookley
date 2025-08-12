@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Grid, List, Sun, Moon, Receipt } from 'lucide-react';
 import { AppCard } from './components/AppCard';
-import PricingModal from './components/PricingModal';
+import { PricingModal } from './components/PricingModal';
 import { invoicingApps } from './data/sampleApps';
 import type { App, UserTier, ViewMode } from './types';
 
