@@ -1,8 +1,216 @@
 import type { App } from '../types';
 
-export const sampleApps: App[] = [];
+export const sampleApps: App[] = [
+  {
+    id: '1',
+    name: 'TaskFlow Manager',
+    description: 'A powerful task management app with drag-and-drop boards, deadlines, and team collaboration features.',
+    technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Supabase'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-15',
+    liveUrl: 'https://taskflow-demo.com',
+    sourceUrl: 'https://github.com/user/taskflow',
+    thumbnail: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 145,
+    tier: 'pro',
+    featured: true
+  },
+  {
+    id: '2',
+    name: 'Weather Dashboard',
+    description: 'Beautiful weather app with detailed forecasts, interactive maps, and location-based alerts.',
+    technologies: ['JavaScript', 'CSS3', 'OpenWeather API'],
+    category: 'utilities',
+    status: 'active',
+    lastUpdated: '2024-01-10',
+    liveUrl: 'https://weather-dash.com',
+    sourceUrl: 'https://github.com/user/weather-dashboard',
+    thumbnail: 'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 98,
+    tier: 'free'
+  },
+  {
+    id: '3',
+    name: 'Expense Tracker Pro',
+    description: 'Smart expense tracking with automated categorization, budget alerts, and detailed analytics.',
+    technologies: ['Vue.js', 'Chart.js', 'Express.js', 'MongoDB'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-12',
+    liveUrl: 'https://expense-tracker-pro.com',
+    thumbnail: 'https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 76,
+    tier: 'premium',
+    featured: true
+  },
+  {
+    id: '4',
+    name: 'Retro Game Collection',
+    description: 'A collection of classic mini-games including Snake, Tetris, and Pac-Man built with HTML5 Canvas.',
+    technologies: ['HTML5 Canvas', 'JavaScript', 'Web Audio API'],
+    category: 'games',
+    status: 'active',
+    lastUpdated: '2024-01-08',
+    liveUrl: 'https://retro-games.com',
+    sourceUrl: 'https://github.com/user/retro-games',
+    thumbnail: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 203,
+    tier: 'free'
+  },
+  {
+    id: '5',
+    name: 'API Documentation Hub',
+    description: 'Interactive API documentation tool with live testing, code generation, and team collaboration.',
+    technologies: ['Next.js', 'Swagger', 'Prism.js', 'Vercel'],
+    category: 'tools',
+    status: 'development',
+    lastUpdated: '2024-01-14',
+    liveUrl: 'https://api-docs-hub.com',
+    sourceUrl: 'https://github.com/user/api-docs',
+    thumbnail: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 34,
+    tier: 'pro'
+  },
+  {
+    id: '6',
+    name: 'Color Palette Generator',
+    description: 'Generate beautiful color palettes with AI assistance, export to various formats, and save favorites.',
+    technologies: ['CSS3', 'JavaScript', 'Color Theory API'],
+    category: 'design',
+    status: 'active',
+    lastUpdated: '2024-01-11',
+    liveUrl: 'https://color-palette-gen.com',
+    thumbnail: 'https://images.pexels.com/photos/1292241/pexels-photo-1292241.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 127,
+    tier: 'pro',
+    featured: true
+  },
+  {
+    id: '7',
+    name: 'SecurePass Generator',
+    description: 'Advanced password generator with customizable rules, strength analysis, and secure storage options.',
+    technologies: ['Vanilla JS', 'Web Crypto API', 'PWA'],
+    category: 'security',
+    status: 'active',
+    lastUpdated: '2024-01-09',
+    liveUrl: 'https://securepass-gen.com',
+    sourceUrl: 'https://github.com/user/password-gen',
+    thumbnail: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 89,
+    tier: 'free'
+  },
+  {
+    id: '8',
+    name: 'Habit Tracker',
+    description: 'Build better habits with streaks, reminders, analytics, and motivational challenges.',
+    technologies: ['React', 'Redux', 'Chart.js', 'Firebase'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-13',
+    liveUrl: 'https://habit-tracker.com',
+    thumbnail: 'https://images.pexels.com/photos/6147094/pexels-photo-6147094.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 156,
+    tier: 'premium'
+  },
+  {
+    id: '9',
+    name: 'Recipe Organizer',
+    description: 'Organize your recipes with smart categorization, meal planning, and shopping list generation.',
+    technologies: ['PHP', 'MySQL', 'Bootstrap', 'jQuery'],
+    category: 'lifestyle',
+    status: 'archived',
+    lastUpdated: '2023-12-20',
+    liveUrl: 'https://recipe-organizer.com',
+    thumbnail: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 45,
+    tier: 'free'
+  },
+  {
+    id: '10',
+    name: 'Code Snippet Manager',
+    description: 'Organize and share code snippets with syntax highlighting, tags, and team collaboration features.',
+    technologies: ['Node.js', 'Express', 'MongoDB', 'Prism.js'],
+    category: 'development',
+    status: 'development',
+    lastUpdated: '2024-01-16',
+    liveUrl: 'https://code-snippets.com',
+    sourceUrl: 'https://github.com/user/snippet-manager',
+    thumbnail: 'https://images.pexels.com/photos/4164418/pexels-photo-4164418.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 67,
+    tier: 'premium'
+  },
+  {
+    id: '11',
+    name: 'Markdown Editor Pro',
+    description: 'Feature-rich markdown editor with live preview, export options, and collaborative editing.',
+    technologies: ['React', 'CodeMirror', 'Electron', 'Node.js'],
+    category: 'tools',
+    status: 'active',
+    lastUpdated: '2024-01-07',
+    liveUrl: 'https://md-editor-pro.com',
+    thumbnail: 'https://images.pexels.com/photos/261662/pexels-photo-261662.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 112,
+    tier: 'pro'
+  },
+  {
+    id: '12',
+    name: 'Focus Timer',
+    description: 'Pomodoro timer with ambient sounds, productivity analytics, and customizable work/break intervals.',
+    technologies: ['React', 'Web Audio API', 'LocalStorage'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-05',
+    liveUrl: 'https://focus-timer.com',
+    sourceUrl: 'https://github.com/user/focus-timer',
+    thumbnail: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 189,
+    tier: 'premium',
+    featured: true
+  }
+];
 
 // Invoicing and Payment Apps - Ready for configuration
 export const invoicingApps: App[] = [
-  // This section will be populated with your invoicing and payment tools
+  {
+    id: 'inv-1',
+    name: 'InvoicePro',
+    description: 'Professional invoicing software with automated billing, payment tracking, and client management.',
+    technologies: ['React', 'Node.js', 'PostgreSQL', 'Stripe API'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-18',
+    liveUrl: 'https://invoicepro.com',
+    sourceUrl: 'https://github.com/user/invoicepro',
+    thumbnail: 'https://images.pexels.com/photos/6863183/pexels-photo-6863183.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 234,
+    tier: 'premium',
+    featured: true
+  },
+  {
+    id: 'inv-2',
+    name: 'QuickBill',
+    description: 'Simple and fast invoicing tool for freelancers and small businesses with PDF export.',
+    technologies: ['Vue.js', 'Express.js', 'SQLite', 'jsPDF'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-16',
+    liveUrl: 'https://quickbill.app',
+    thumbnail: 'https://images.pexels.com/photos/4386431/pexels-photo-4386431.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 156,
+    tier: 'free'
+  },
+  {
+    id: 'inv-3',
+    name: 'BillTracker Enterprise',
+    description: 'Enterprise-grade billing solution with multi-currency support, advanced reporting, and API integration.',
+    technologies: ['Angular', 'Spring Boot', 'MySQL', 'Docker'],
+    category: 'business',
+    status: 'active',
+    lastUpdated: '2024-01-20',
+    liveUrl: 'https://billtracker-enterprise.com',
+    thumbnail: 'https://images.pexels.com/photos/7681091/pexels-photo-7681091.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 89,
+    tier: 'enterprise'
+  }
 ];
