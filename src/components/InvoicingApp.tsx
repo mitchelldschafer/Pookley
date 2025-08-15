@@ -27,6 +27,7 @@ interface InvoicingAppProps {
 export const InvoicingApp: React.FC<InvoicingAppProps> = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'customers' | 'invoices'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNewInvoiceModal, setShowNewInvoiceModal] = useState(false);
 
   // Mock data for demonstration
   const mockStats = {
