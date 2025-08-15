@@ -125,16 +125,14 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => 
                     <Github className="w-4 h-4" />
                   </a>
                 )}
-                <a
-                  href={hasAccess ? app.liveUrl : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => handleLaunchApp(app, hasAccess)}
                   className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium flex items-center space-x-1 ${!hasAccess ? 'cursor-not-allowed opacity-50' : ''}`}
-                  onClick={!hasAccess ? (e) => e.preventDefault() : undefined}
+                  disabled={!hasAccess}
                 >
                   {hasAccess ? <ExternalLink className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                   <span>{hasAccess ? 'Launch' : 'Locked'}</span>
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -230,16 +228,14 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => 
               <span>Source</span>
             </a>
           )}
-          <a
-            href={hasAccess ? app.liveUrl : '#'}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => handleLaunchApp(app, hasAccess)}
             className={`${app.sourceUrl ? 'flex-1' : 'w-full'} px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-center text-sm font-medium flex items-center justify-center space-x-1 ${!hasAccess ? 'cursor-not-allowed opacity-50' : ''}`}
-            onClick={!hasAccess ? (e) => e.preventDefault() : undefined}
+            disabled={!hasAccess}
           >
             {hasAccess ? <ExternalLink className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             <span>{hasAccess ? 'Launch' : 'Locked'}</span>
-          </a>
+          </button>
         </div>
       </div>
     </div>
