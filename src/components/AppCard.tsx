@@ -7,9 +7,10 @@ interface AppCardProps {
   viewMode: 'grid' | 'list';
   userTier: 'free' | 'pro' | 'premium';
   onUpgrade?: () => void;
+  onLaunchInvoicing?: () => void;
 }
 
-export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => {
+export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier, onLaunchInvoicing }) => {
   const handleLaunchApp = (app: App, hasAccess: boolean) => {
     if (!hasAccess) {
       return;
@@ -17,8 +18,12 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => 
     
     if (app.liveUrl) {
       if (app.liveUrl.startsWith('/')) {
-        // Internal app - show alert for now (can be replaced with proper routing)
-        alert(`Navigating to internal app: ${app.liveUrl}`);
+        // Internal app - handle invoicing specially
+        if (app.liveUrl.includes('invoicing') && onLaunchInvoicing) {
+          onLaunchInvoicing();
+        } else {
+          alert(`Navigating to internal app: ${app.liveUrl}`);
+        }
       } else {
         // External app - open in new tab
         window.open(app.liveUrl, '_blank', 'noopener,noreferrer');

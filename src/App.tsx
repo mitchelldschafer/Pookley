@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Grid, List, Sun, Moon, Receipt } from 'lucide-react';
+import { Search, Grid, List, Sun, Moon, Receipt, ArrowLeft } from 'lucide-react';
 import { AppCard } from './components/AppCard';
 import { PricingModal } from './components/PricingModal';
+import { InvoicingApp } from './components/InvoicingApp';
 import { invoicingApps } from './data/sampleApps';
 import type { App, UserTier, ViewMode } from './types';
 
@@ -23,6 +24,7 @@ function App() {
   });
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'invoicing'>('dashboard');
 
   useEffect(() => {
     localStorage.setItem('pookley-view-mode', viewMode);
@@ -75,6 +77,14 @@ function App() {
   const handleUpgrade = (tier: UserTier) => {
     setUserTier(tier);
     setShowPricingModal(false);
+  };
+
+  const handleLaunchInvoicing = () => {
+    setCurrentView('invoicing');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -145,18 +155,22 @@ function App() {
 
               <nav className="hidden md:flex items-center space-x-1">
                 {[
-                  { key: 'crm-sales', label: 'CRM & Sales' },
-                  { key: 'finance-billing', label: 'Finance & Billing' },
-                  { key: 'analytics-reports', label: 'Analytics & Reports' },
-                  { key: 'communication', label: 'Communication' },
-                  { key: 'productivity', label: 'Productivity' },
-                  { key: 'inventory-orders', label: 'Inventory & Orders' }
+                  { key: 'crm-sales', label: 'CRM & Sales', action: () => {} },
+                  { key: 'finance-billing', label: 'Finance & Billing', action: handleLaunchInvoicing },
+                  { key: 'analytics-reports', label: 'Analytics & Reports', action: () => {} },
+                  { key: 'communication', label: 'Communication', action: () => {} },
+                  { key: 'productivity', label: 'Productivity', action: () => {} },
+                  { key: 'inventory-orders', label: 'Inventory & Orders', action: () => {} }
                 ].map(({ key, label }) => (
                   <div key={key} className="relative">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleDropdown(key);
+                        if (key === 'finance-billing') {
+                          handleLaunchInvoicing();
+                        } else {
+                          toggleDropdown(key);
+                        }
                       }}
                       className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                         darkMode 
@@ -167,7 +181,7 @@ function App() {
                       {label}
                     </button>
                     
-                    {activeDropdown === key && (
+                    {activeDropdown === key && key !== 'finance-billing' && (
                       <div className={`absolute top-full left-0 mt-1 w-64 rounded-md shadow-lg z-50 ${
                         darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
                       }`}>
@@ -196,6 +210,20 @@ function App() {
             </div>
 
             <div className="flex items-center space-x-4">
+              {currentView === 'invoicing' && (
+                <button
+                  onClick={handleBackToDashboard}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors duration-200 ${
+                    darkMode 
+                      ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to Dashboard</span>
+                </button>
+              )}
+
               <button
                 onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
                 className={`p-2 rounded-md transition-colors duration-200 ${
@@ -231,7 +259,8 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {currentView === 'dashboard' ? (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             All-in-One Business Platform
@@ -315,7 +344,7 @@ function App() {
                   app={app}
                   userTier={userTier}
                   viewMode={viewMode}
-                  onUpgrade={() => setShowPricingModal(true)}
+                  onLaunchInvoicing={handleLaunchInvoicing}
                 />
               ))}
             </div>
@@ -342,7 +371,10 @@ function App() {
             </div>
           )}
         </section>
-      </main>
+        </main>
+      ) : (
+        <InvoicingApp darkMode={darkMode} />
+      )}
 
       {showPricingModal && (
         <PricingModal
