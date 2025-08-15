@@ -261,119 +261,119 @@ function App() {
 
       {currentView === 'dashboard' ? (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            All-in-One Business Platform
-          </h2>
-          <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Everything your business needs in one integrated platform. From CRM to invoicing, analytics to inventory management.
-          </p>
-        </div>
-
-        <div className="mb-8 flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                darkMode ? 'text-gray-400' : 'text-gray-400'
-              }`} />
-              <input
-                type="text"
-                placeholder="Search business tools..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
-                  darkMode 
-                    ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }`}
-              />
-            </div>
+          <div className="mb-8">
+            <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              All-in-One Business Platform
+            </h2>
+            <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Everything your business needs in one integrated platform. From CRM to invoicing, analytics to inventory management.
+            </p>
           </div>
 
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
-              darkMode 
-                ? 'bg-gray-800 border-gray-700 text-white' 
-                : 'bg-white border-gray-300 text-gray-900'
-            }`}
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'name' | 'usage' | 'lastUpdated')}
-            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
-              darkMode 
-                ? 'bg-gray-800 border-gray-700 text-white' 
-                : 'bg-white border-gray-300 text-gray-900'
-            }`}
-          >
-            <option value="name">Sort by Name</option>
-            <option value="usage">Sort by Usage</option>
-            <option value="lastUpdated">Sort by Updated</option>
-          </select>
-        </div>
-
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <Receipt className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-            <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Invoicing & Payment Solutions
-            </h3>
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              Core Business Tools
-            </span>
-          </div>
-          
-          {filteredAndSortedApps.length > 0 ? (
-            <div className={`grid gap-6 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1'
-            }`}>
-              {filteredAndSortedApps.map(app => (
-                <AppCard
-                  key={app.id}
-                  app={app}
-                  userTier={userTier}
-                  viewMode={viewMode}
-                  onLaunchInvoicing={handleLaunchInvoicing}
+          <div className="mb-8 flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                  darkMode ? 'text-gray-400' : 'text-gray-400'
+                }`} />
+                <input
+                  type="text"
+                  placeholder="Search business tools..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+                    darkMode 
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
                 />
+              </div>
+            </div>
+
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+                darkMode 
+                  ? 'bg-gray-800 border-gray-700 text-white' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)}
+                </option>
               ))}
-            </div>
-          ) : (
-            <div className={`text-center py-12 ${
-              darkMode ? 'bg-gray-800' : 'bg-white'
-            } rounded-lg border-2 border-dashed ${
-              darkMode ? 'border-gray-700' : 'border-gray-300'
-            }`}>
-              <Receipt className={`w-16 h-16 mx-auto mb-4 ${
-                darkMode ? 'text-gray-600' : 'text-gray-400'
-              }`} />
-              <h3 className={`text-lg font-medium mb-2 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                Professional Financial Management Tools
+            </select>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'name' | 'usage' | 'lastUpdated')}
+              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+                darkMode 
+                  ? 'bg-gray-800 border-gray-700 text-white' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            >
+              <option value="name">Sort by Name</option>
+              <option value="usage">Sort by Usage</option>
+              <option value="lastUpdated">Sort by Updated</option>
+            </select>
+          </div>
+
+          <section className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <Receipt className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+              <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Invoicing & Payment Solutions
               </h3>
-              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-4`}>
-                Comprehensive invoicing, billing, and payment processing solutions for your business.
-              </p>
-              <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                Tools will be available here soon.
-              </p>
+              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                Core Business Tools
+              </span>
             </div>
-          )}
-        </section>
+            
+            {filteredAndSortedApps.length > 0 ? (
+              <div className={`grid gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  : 'grid-cols-1'
+              }`}>
+                {filteredAndSortedApps.map(app => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    userTier={userTier}
+                    viewMode={viewMode}
+                    onLaunchInvoicing={handleLaunchInvoicing}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={`text-center py-12 ${
+                darkMode ? 'bg-gray-800' : 'bg-white'
+              } rounded-lg border-2 border-dashed ${
+                darkMode ? 'border-gray-700' : 'border-gray-300'
+              }`}>
+                <Receipt className={`w-16 h-16 mx-auto mb-4 ${
+                  darkMode ? 'text-gray-600' : 'text-gray-400'
+                }`} />
+                <h3 className={`text-lg font-medium mb-2 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Professional Financial Management Tools
+                </h3>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-4`}>
+                  Comprehensive invoicing, billing, and payment processing solutions for your business.
+                </p>
+                <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  Tools will be available here soon.
+                </p>
+              </div>
+            )}
+          </section>
         </main>
       ) : (
-        <InvoicingApp darkMode={darkMode} />
+        <InvoicingApp />
       )}
 
       {showPricingModal && (
