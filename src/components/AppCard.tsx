@@ -6,9 +6,26 @@ interface AppCardProps {
   app: App;
   viewMode: 'grid' | 'list';
   userTier: 'free' | 'pro' | 'premium';
+  onUpgrade?: () => void;
 }
 
 export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier }) => {
+  const handleLaunchApp = (app: App, hasAccess: boolean) => {
+    if (!hasAccess) {
+      return;
+    }
+    
+    if (app.liveUrl) {
+      if (app.liveUrl.startsWith('/')) {
+        // Internal app - show alert for now (can be replaced with proper routing)
+        alert(`Navigating to internal app: ${app.liveUrl}`);
+      } else {
+        // External app - open in new tab
+        window.open(app.liveUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+  };
+
   const statusConfig = {
     active: { icon: Zap, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', label: 'Active' },
     development: { icon: Pause, color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: 'In Development' },
