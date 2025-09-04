@@ -17,6 +17,13 @@ import { CRMJobs } from './crm/CRMJobs';
 import { CRMTasks } from './crm/CRMTasks';
 import { CRMInvoices } from './crm/CRMInvoices';
 import { CRMSettings } from './crm/CRMSettings';
+import { QuickAddSheet } from './crm/modals/QuickAddSheet';
+import { AddClientModal } from './crm/modals/AddClientModal';
+import { AddJobModal } from './crm/modals/AddJobModal';
+import { AddTaskModal } from './crm/modals/AddTaskModal';
+import { AddInvoiceModal } from './crm/modals/AddInvoiceModal';
+import { useClients, useJobs, useTasks, useInvoices } from '../hooks/useCrmData';
+import type { CreateClientData, CreateJobData, CreateTaskData, CreateInvoiceData } from '../types/crm';
 
 interface CRMAppProps {
   darkMode: boolean;
@@ -27,6 +34,16 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
   const [activeTab, setActiveTab] = useState<'dashboard' | 'clients' | 'jobs' | 'tasks' | 'invoices' | 'settings'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [showJobModal, setShowJobModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  
+  // Data hooks
+  const { addClient } = useClients();
+  const { addJob } = useJobs();
+  const { addTask } = useTasks();
+  const { addInvoice } = useInvoices();
 
   const navigation = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
@@ -39,8 +56,53 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
 
   const handleQuickAdd = (type: 'client' | 'job' | 'task' | 'invoice') => {
     setShowQuickAdd(false);
-    // TODO: Open appropriate modal for quick add
-    console.log(`Quick add ${type}`);
+    
+    switch (type) {
+      case 'client':
+        setShowClientModal(true);
+        break;
+      case 'job':
+        setShowJobModal(true);
+        break;
+      case 'task':
+        setShowTaskModal(true);
+        break;
+      case 'invoice':
+        setShowInvoiceModal(true);
+        break;
+    }
+  };
+
+  const handleAddClient = async (data: CreateClientData) => {
+    try {
+      await addClient(data);
+    } catch (error) {
+      console.error('Error creating client:', error);
+    }
+  };
+
+  const handleAddJob = async (data: CreateJobData) => {
+    try {
+      await addJob(data);
+    } catch (error) {
+      console.error('Error creating job:', error);
+    }
+  };
+
+  const handleAddTask = async (data: CreateTaskData) => {
+    try {
+      await addTask(data);
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  };
+
+  const handleAddInvoice = async (data: CreateInvoiceData) => {
+    try {
+      await addInvoice(data);
+    } catch (error) {
+      console.error('Error creating invoice:', error);
+    }
   };
 
   const renderContent = () => {
@@ -138,7 +200,7 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
                         <button
                           key={type}
                           onClick={() => handleQuickAdd(type as any)}
-                          className={`w-full px-4 py-2 text-left hover:bg-opacity-50 transition-colors duration-200 flex items-center space-x-3 ${
+                          className={`w-full px-4 py-2 text-left transition-colors duration-200 flex items-center space-x-3 ${
                             darkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
                           }`}
                         >
@@ -225,6 +287,45 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
           })}
         </div>
       </div>
+
+      {/* Modals */}
+      <QuickAddSheet
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onAddClient={() => handleQuickAdd('client')}
+        onAddJob={() => handleQuickAdd('job')}
+        onAddTask={() => handleQuickAdd('task')}
+        onAddInvoice={() => handleQuickAdd('invoice')}
+        darkMode={darkMode}
+      />
+
+      <AddClientModal
+        isOpen={showClientModal}
+        onClose={() => setShowClientModal(false)}
+        onSubmit={handleAddClient}
+        darkMode={darkMode}
+      />
+
+      <AddJobModal
+        isOpen={showJobModal}
+        onClose={() => setShowJobModal(false)}
+        onSubmit={handleAddJob}
+        darkMode={darkMode}
+      />
+
+      <AddTaskModal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        onSubmit={handleAddTask}
+        darkMode={darkMode}
+      />
+
+      <AddInvoiceModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        onSubmit={handleAddInvoice}
+        darkMode={darkMode}
+      />
 
       {/* Click outside to close quick add */}
       {showQuickAdd && (

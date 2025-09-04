@@ -165,8 +165,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                 {/* Add Job to Stage Button */}
                 <button
-                  onClick={() => console.log(`Add job to ${stage}`)}
-                  className={`w-full p-3 border-2 border-dashed rounded-lg transition-colors ${
+                  onClick={() => console.log(`Add job to ${stage} stage`)}
+                  className={`w-full p-3 border-2 border-dashed rounded-lg transition-colors hover:scale-105 ${
                     darkMode 
                       ? 'border-gray-600 text-gray-400 hover:border-blue-500 hover:text-blue-400' 
                       : 'border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600'
