@@ -544,8 +544,6 @@ export const InvoicingApp: React.FC<InvoicingAppProps> = ({ darkMode }) => {
             {activeTab === 'customers' && renderCustomers()}
             {activeTab === 'invoices' && renderInvoices()}
           </main>
-          
-          <NewInvoiceModal />
         </div>
       </div>
     </div>
