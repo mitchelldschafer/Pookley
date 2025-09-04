@@ -9,11 +9,12 @@ import {
   Calendar,
   Activity
 } from 'lucide-react';
-import { mockDashboardStats, mockTasks, mockActivities } from '../../data/mockCrmData';
+import { mockDashboardStats } from '../../data/mockCrmData';
 import { StageChip } from './StageChip';
 import { StatusBadge } from './StatusBadge';
 import { MoneyFormatter } from './MoneyFormatter';
 import { ActivityFeed } from './ActivityFeed';
+import { useTasks } from '../../hooks/useCrmData';
 import type { JobStage } from '../../types/crm';
 
 interface CRMDashboardProps {
@@ -23,15 +24,17 @@ interface CRMDashboardProps {
 export const CRMDashboard: React.FC<CRMDashboardProps> = ({ darkMode }) => {
   const stats = mockDashboardStats;
   
+  const { tasks, updateTaskStatus } = useTasks();
+  
   // Get today's and overdue tasks
   const today = new Date();
-  const todaysTasks = mockTasks.filter(task => {
+  const todaysTasks = tasks.filter(task => {
     if (!task.due_at || task.status === 'DONE') return false;
     const dueDate = new Date(task.due_at);
     return dueDate.toDateString() === today.toDateString();
   });
 
-  const overdueTasks = mockTasks.filter(task => {
+  const overdueTasks = tasks.filter(task => {
     if (!task.due_at || task.status === 'DONE') return false;
     const dueDate = new Date(task.due_at);
     return dueDate < today;
@@ -44,9 +47,12 @@ export const CRMDashboard: React.FC<CRMDashboardProps> = ({ darkMode }) => {
     console.log(`Filter jobs by stage: ${stage}`);
   };
 
-  const handleTaskToggle = (taskId: string) => {
-    // TODO: Toggle task completion
-    console.log(`Toggle task: ${taskId}`);
+  const handleTaskToggle = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      const newStatus = task.status === 'DONE' ? 'OPEN' : 'DONE';
+      await updateTaskStatus(taskId, newStatus);
+    }
   };
 
   return (

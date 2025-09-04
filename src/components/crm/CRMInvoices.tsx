@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, Eye, Download, Send, DollarSign, Calendar } from 'lucide-react';
-import { mockInvoices, mockClients, mockJobs } from '../../data/mockCrmData';
+import { mockClients, mockJobs } from '../../data/mockCrmData';
 import { StatusBadge } from './StatusBadge';
 import { MoneyFormatter } from './MoneyFormatter';
+import { AddInvoiceModal } from './modals/AddInvoiceModal';
+import { useInvoices } from '../../hooks/useCrmData';
 import type { InvoiceStatus } from '../../types/crm';
 
 interface CRMInvoicesProps {
@@ -14,9 +16,11 @@ export const CRMInvoices: React.FC<CRMInvoicesProps> = ({ darkMode, searchTerm }
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<'created_at' | 'due_at' | 'amount'>('created_at');
   const [showAddModal, setShowAddModal] = useState(false);
+  
+  const { invoices, loading, addInvoice, updateInvoiceStatus } = useInvoices();
 
   const filteredInvoices = useMemo(() => {
-    return mockInvoices.filter(invoice => {
+    return invoices.filter(invoice => {
       const client = mockClients.find(c => c.id === invoice.client_id);
       const matchesSearch = invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           client?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,7 +40,7 @@ export const CRMInvoices: React.FC<CRMInvoicesProps> = ({ darkMode, searchTerm }
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
-  }, [searchTerm, statusFilter, sortBy]);
+  }, [invoices, searchTerm, statusFilter, sortBy]);
 
   const getClientName = (clientId: string) => {
     return mockClients.find(c => c.id === clientId)?.name || 'Unknown Client';
@@ -52,9 +56,12 @@ export const CRMInvoices: React.FC<CRMInvoicesProps> = ({ darkMode, searchTerm }
     return new Date(dueAt) < new Date();
   };
 
-  const handleInvoiceAction = (action: string, invoiceId: string) => {
-    // TODO: Implement invoice actions
-    console.log(`${action} invoice: ${invoiceId}`);
+  const handleInvoiceAction = async (action: string, invoiceId: string) => {
+    if (action === 'send') {
+      await updateInvoiceStatus(invoiceId, 'SENT');
+    } else {
+      console.log(`${action} invoice: ${invoiceId}`);
+    }
   };
 
   const totalUnpaid = filteredInvoices
@@ -64,6 +71,14 @@ export const CRMInvoices: React.FC<CRMInvoicesProps> = ({ darkMode, searchTerm }
   const overdueCount = filteredInvoices
     .filter(inv => isOverdue(inv.due_at, inv.status))
     .length;
+
+  const handleAddInvoice = async (data: CreateInvoiceData) => {
+    try {
+      await addInvoice(data);
+    } catch (error) {
+      console.error('Error creating invoice:', error);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -283,37 +298,12 @@ export const CRMInvoices: React.FC<CRMInvoicesProps> = ({ darkMode, searchTerm }
         </div>
       )}
 
-      {/* Add Invoice Modal Placeholder */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg w-full max-w-lg p-6`}>
-            <h2 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Create New Invoice
-            </h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
-              Invoice creation form will be implemented here with client/job selection and line items.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className={`px-4 py-2 border rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Create Invoice
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddInvoiceModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddInvoice}
+        darkMode={darkMode}
+      />
     </div>
   );
 };

@@ -13,8 +13,10 @@ import {
   Calendar,
   Eye
 } from 'lucide-react';
-import { mockClients, getJobsByClientId, getInvoicesByClientId } from '../../data/mockCrmData';
+import { getJobsByClientId, getInvoicesByClientId } from '../../data/mockCrmData';
 import { MoneyFormatter } from './MoneyFormatter';
+import { AddClientModal } from './modals/AddClientModal';
+import { useClients } from '../../hooks/useCrmData';
 import type { Client } from '../../types/crm';
 
 interface CRMClientsProps {
@@ -26,9 +28,11 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'created_at' | 'total_value'>('name');
+  
+  const { clients, loading, addClient, updateClient, deleteClient } = useClients();
 
   const filteredAndSortedClients = useMemo(() => {
-    let filtered = mockClients.filter(client =>
+    let filtered = clients.filter(client =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.contact_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -44,17 +48,20 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
           return a.name.localeCompare(b.name);
       }
     });
-  }, [searchTerm, sortBy]);
+  }, [clients, searchTerm, sortBy]);
 
   const handleEditClient = (client: Client) => {
     setSelectedClient(client);
     setShowAddModal(true);
   };
 
-  const handleDeleteClient = (clientId: string) => {
+  const handleDeleteClient = async (clientId: string) => {
     if (confirm('Are you sure you want to delete this client? This will also delete all associated jobs and tasks.')) {
-      // TODO: Implement delete functionality
-      console.log(`Delete client: ${clientId}`);
+      try {
+        await deleteClient(clientId);
+      } catch (error) {
+        console.error('Error deleting client:', error);
+      }
     }
   };
 
@@ -62,6 +69,27 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
     // TODO: Navigate to client detail page
     console.log(`View client: ${client.id}`);
   };
+
+  const handleAddClient = async (data: CreateClientData) => {
+    try {
+      await addClient(data);
+    } catch (error) {
+      console.error('Error creating client:', error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setSelectedClient(null);
+  };
+
+  if (loading && clients.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -92,7 +120,10 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
           </select>
           
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => {
+              setSelectedClient(null);
+              setShowAddModal(true);
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
@@ -242,7 +273,10 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
           </p>
           {!searchTerm && (
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => {
+                setSelectedClient(null);
+                setShowAddModal(true);
+              }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto"
             >
               <Plus className="w-4 h-4" />
@@ -252,44 +286,12 @@ export const CRMClients: React.FC<CRMClientsProps> = ({ darkMode, searchTerm }) 
         </div>
       )}
 
-      {/* Add/Edit Client Modal Placeholder */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg w-full max-w-md p-6`}>
-            <h2 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {selectedClient ? 'Edit Client' : 'Add New Client'}
-            </h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
-              Client form will be implemented here with proper validation.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setSelectedClient(null);
-                }}
-                className={`px-4 py-2 border rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // TODO: Implement save functionality
-                  setShowAddModal(false);
-                  setSelectedClient(null);
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                {selectedClient ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddClientModal
+        isOpen={showAddModal}
+        onClose={handleCloseModal}
+        onSubmit={handleAddClient}
+        darkMode={darkMode}
+      />
     </div>
   );
 };

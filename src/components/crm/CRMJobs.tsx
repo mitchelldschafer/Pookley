@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Filter, Calendar, DollarSign, MapPin, Tag } from 'lucide-react';
-import { mockJobs, mockClients } from '../../data/mockCrmData';
+import { mockClients } from '../../data/mockCrmData';
 import { StageChip } from './StageChip';
 import { MoneyFormatter } from './MoneyFormatter';
 import { KanbanBoard } from './KanbanBoard';
+import { AddJobModal } from './modals/AddJobModal';
+import { useJobs } from '../../hooks/useCrmData';
 import type { JobStage } from '../../types/crm';
 
 interface CRMJobsProps {
@@ -15,28 +17,41 @@ export const CRMJobs: React.FC<CRMJobsProps> = ({ darkMode, searchTerm }) => {
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
   const [stageFilter, setStageFilter] = useState<JobStage | 'all'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  
+  const { jobs, loading, addJob, updateJobStage } = useJobs();
 
   const filteredJobs = useMemo(() => {
-    return mockJobs.filter(job => {
+    return jobs.filter(job => {
       const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           job.description?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStage = stageFilter === 'all' || job.stage === stageFilter;
       return matchesSearch && matchesStage;
     });
-  }, [searchTerm, stageFilter]);
+  }, [jobs, searchTerm, stageFilter]);
 
   const getClientName = (clientId: string) => {
     return mockClients.find(c => c.id === clientId)?.name || 'Unknown Client';
   };
 
-  const handleStageChange = (jobId: string, newStage: JobStage) => {
-    // TODO: Update job stage in database
-    console.log(`Update job ${jobId} to stage ${newStage}`);
+  const handleStageChange = async (jobId: string, newStage: JobStage) => {
+    try {
+      await updateJobStage(jobId, newStage);
+    } catch (error) {
+      console.error('Error updating job stage:', error);
+    }
   };
 
   const handleJobClick = (jobId: string) => {
     // TODO: Navigate to job detail
     console.log(`View job: ${jobId}`);
+  };
+
+  const handleAddJob = async (data: CreateJobData) => {
+    try {
+      await addJob(data);
+    } catch (error) {
+      console.error('Error creating job:', error);
+    }
   };
 
   const renderListView = () => (
@@ -180,37 +195,12 @@ export const CRMJobs: React.FC<CRMJobsProps> = ({ darkMode, searchTerm }) => {
         renderListView()
       )}
 
-      {/* Add Job Modal Placeholder */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg w-full max-w-lg p-6`}>
-            <h2 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Add New Job
-            </h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
-              Job creation form will be implemented here with client selection, stage, and details.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className={`px-4 py-2 border rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Create Job
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddJobModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddJob}
+        darkMode={darkMode}
+      />
     </div>
   );
 };

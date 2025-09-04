@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Filter, Calendar, AlertTriangle, CheckSquare, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { mockTasks, mockClients, mockJobs } from '../../data/mockCrmData';
+import { mockClients, mockJobs } from '../../data/mockCrmData';
 import { StatusBadge } from './StatusBadge';
+import { AddTaskModal } from './modals/AddTaskModal';
+import { useTasks } from '../../hooks/useCrmData';
 import type { TaskStatus, TaskPriority } from '../../types/crm';
 
 interface CRMTasksProps {
@@ -15,9 +17,11 @@ export const CRMTasks: React.FC<CRMTasksProps> = ({ darkMode, searchTerm }) => {
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [showAddModal, setShowAddModal] = useState(false);
+  
+  const { tasks, loading, addTask, updateTaskStatus } = useTasks();
 
   const filteredTasks = useMemo(() => {
-    return mockTasks.filter(task => {
+    return tasks.filter(task => {
       const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           task.description?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
@@ -39,7 +43,7 @@ export const CRMTasks: React.FC<CRMTasksProps> = ({ darkMode, searchTerm }) => {
       
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     });
-  }, [searchTerm, statusFilter, priorityFilter]);
+  }, [tasks, searchTerm, statusFilter, priorityFilter]);
 
   const getClientName = (clientId?: string) => {
     if (!clientId) return null;
@@ -69,14 +73,25 @@ export const CRMTasks: React.FC<CRMTasksProps> = ({ darkMode, searchTerm }) => {
     return new Date(dueAt) < new Date();
   };
 
-  const handleTaskToggle = (taskId: string) => {
-    // TODO: Toggle task completion
-    console.log(`Toggle task: ${taskId}`);
+  const handleTaskToggle = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      const newStatus = task.status === 'DONE' ? 'OPEN' : 'DONE';
+      await updateTaskStatus(taskId, newStatus);
+    }
   };
 
   const handleTaskClick = (taskId: string) => {
     // TODO: Open task detail/edit modal
     console.log(`Edit task: ${taskId}`);
+  };
+
+  const handleAddTask = async (data: CreateTaskData) => {
+    try {
+      await addTask(data);
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
   };
 
   return (
@@ -257,37 +272,12 @@ export const CRMTasks: React.FC<CRMTasksProps> = ({ darkMode, searchTerm }) => {
         </div>
       )}
 
-      {/* Add Task Modal Placeholder */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg w-full max-w-lg p-6`}>
-            <h2 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Add New Task
-            </h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>
-              Task creation form will be implemented here with job/client linking, priority, and due date.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className={`px-4 py-2 border rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Create Task
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddTaskModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddTask}
+        darkMode={darkMode}
+      />
     </div>
   );
 };
