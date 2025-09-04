@@ -3,6 +3,7 @@ import { Search, Grid, List, Sun, Moon, Receipt, ArrowLeft } from 'lucide-react'
 import { AppCard } from './components/AppCard';
 import { PricingModal } from './components/PricingModal';
 import { InvoicingApp } from './components/InvoicingApp';
+import { CRMApp } from './components/CRMApp';
 import { invoicingApps } from './data/sampleApps';
 import type { App, UserTier, ViewMode } from './types';
 
@@ -24,7 +25,7 @@ function App() {
   });
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'invoicing'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'invoicing' | 'crm'>('dashboard');
 
   useEffect(() => {
     localStorage.setItem('pookley-view-mode', viewMode);
@@ -81,6 +82,10 @@ function App() {
 
   const handleLaunchInvoicing = () => {
     setCurrentView('invoicing');
+  };
+
+  const handleLaunchCRM = () => {
+    setCurrentView('crm');
   };
 
   const handleBackToDashboard = () => {
@@ -155,7 +160,7 @@ function App() {
 
               <nav className="hidden md:flex items-center space-x-1">
                 {[
-                  { key: 'crm-sales', label: 'CRM & Sales', action: () => {} },
+                  { key: 'crm-sales', label: 'CRM & Sales', action: handleLaunchCRM },
                   { key: 'finance-billing', label: 'Finance & Billing', action: handleLaunchInvoicing },
                   { key: 'analytics-reports', label: 'Analytics & Reports', action: () => {} },
                   { key: 'communication', label: 'Communication', action: () => {} },
@@ -166,7 +171,9 @@ function App() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (key === 'finance-billing') {
+                        if (key === 'crm-sales') {
+                          handleLaunchCRM();
+                        } else if (key === 'finance-billing') {
                           handleLaunchInvoicing();
                         } else {
                           toggleDropdown(key);
@@ -181,7 +188,7 @@ function App() {
                       {label}
                     </button>
                     
-                    {activeDropdown === key && key !== 'finance-billing' && (
+                    {activeDropdown === key && !['crm-sales', 'finance-billing'].includes(key) && (
                       <div className={`absolute top-full left-0 mt-1 w-64 rounded-md shadow-lg z-50 ${
                         darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
                       }`}>
@@ -210,7 +217,7 @@ function App() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {currentView === 'invoicing' && (
+              {(currentView === 'invoicing' || currentView === 'crm') && (
                 <button
                   onClick={handleBackToDashboard}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors duration-200 ${
@@ -345,6 +352,7 @@ function App() {
                     userTier={userTier}
                     viewMode={viewMode}
                     onLaunchInvoicing={handleLaunchInvoicing}
+                    onLaunchCRM={handleLaunchCRM}
                   />
                 ))}
               </div>
@@ -373,7 +381,11 @@ function App() {
           </section>
         </main>
       ) : (
-        <InvoicingApp />
+        currentView === 'invoicing' ? (
+          <InvoicingApp />
+        ) : (
+          <CRMApp darkMode={darkMode} onBackToDashboard={handleBackToDashboard} />
+        )
       )}
 
       {showPricingModal && (

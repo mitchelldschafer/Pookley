@@ -8,9 +8,10 @@ interface AppCardProps {
   userTier: 'free' | 'pro' | 'premium';
   onUpgrade?: () => void;
   onLaunchInvoicing?: () => void;
+  onLaunchCRM?: () => void;
 }
 
-export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier, onLaunchInvoicing }) => {
+export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier, onLaunchInvoicing, onLaunchCRM }) => {
   const handleLaunchApp = (app: App, hasAccess: boolean) => {
     if (!hasAccess) {
       return;
@@ -19,7 +20,9 @@ export const AppCard: React.FC<AppCardProps> = ({ app, viewMode, userTier, onLau
     if (app.liveUrl) {
       if (app.liveUrl.startsWith('/')) {
         // Internal app - handle invoicing specially
-        if (app.liveUrl.includes('invoicing') && onLaunchInvoicing) {
+        if (app.liveUrl.includes('crm') && onLaunchCRM) {
+          onLaunchCRM();
+        } else if (app.liveUrl.includes('invoicing') && onLaunchInvoicing) {
           onLaunchInvoicing();
         } else {
           alert(`Navigating to internal app: ${app.liveUrl}`);

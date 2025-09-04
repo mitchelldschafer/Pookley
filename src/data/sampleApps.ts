@@ -173,6 +173,21 @@ export const sampleApps: App[] = [
 // Invoicing and Payment Apps - Ready for configuration
 export const invoicingApps: App[] = [
   {
+    id: 'crm-1',
+    name: 'Pookley CRM',
+    description: 'Ultra-lightweight CRM for solo operators with client management, job pipeline, and task tracking.',
+    technologies: ['React', 'TypeScript', 'Supabase', 'Tailwind CSS'],
+    category: 'productivity',
+    status: 'active',
+    lastUpdated: '2024-01-25',
+    liveUrl: '/apps/crm',
+    sourceUrl: 'https://github.com/pookley/crm',
+    thumbnail: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
+    usage: 0,
+    tier: 'free',
+    featured: true
+  },
+  {
     id: 'inv-1',
     name: 'Pookley Invoicing',
     description: 'Complete invoicing and payment solution with customer management, PDF export, and Stripe integration.',
