@@ -9,7 +9,8 @@ import {
   ArrowLeft,
   Search,
   Plus,
-  Bell
+  Bell,
+  TrendingUp
 } from 'lucide-react';
 import { CRMDashboard } from './crm/CRMDashboard';
 import { CRMClients } from './crm/CRMClients';
@@ -52,7 +53,7 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
     { id: 'jobs', name: 'Jobs', icon: Briefcase },
     { id: 'tasks', name: 'Tasks', icon: CheckSquare },
     { id: 'invoices', name: 'Invoices', icon: FileText },
-    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
+    { id: 'analytics', name: 'Analytics', icon: TrendingUp },
     { id: 'settings', name: 'Settings', icon: Settings },
   ];
 
