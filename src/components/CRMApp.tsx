@@ -17,6 +17,7 @@ import { CRMJobs } from './crm/CRMJobs';
 import { CRMTasks } from './crm/CRMTasks';
 import { CRMInvoices } from './crm/CRMInvoices';
 import { CRMSettings } from './crm/CRMSettings';
+import { ServiceAnalyticsDashboard } from './crm/ServiceAnalyticsDashboard';
 import { QuickAddSheet } from './crm/modals/QuickAddSheet';
 import { AddClientModal } from './crm/modals/AddClientModal';
 import { AddJobModal } from './crm/modals/AddJobModal';
@@ -31,7 +32,7 @@ interface CRMAppProps {
 }
 
 export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'clients' | 'jobs' | 'tasks' | 'invoices' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'clients' | 'jobs' | 'tasks' | 'invoices' | 'analytics' | 'settings'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
@@ -51,6 +52,7 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
     { id: 'jobs', name: 'Jobs', icon: Briefcase },
     { id: 'tasks', name: 'Tasks', icon: CheckSquare },
     { id: 'invoices', name: 'Invoices', icon: FileText },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
     { id: 'settings', name: 'Settings', icon: Settings },
   ];
 
@@ -117,6 +119,8 @@ export const CRMApp: React.FC<CRMAppProps> = ({ darkMode, onBackToDashboard }) =
         return <CRMTasks darkMode={darkMode} searchTerm={searchTerm} />;
       case 'invoices':
         return <CRMInvoices darkMode={darkMode} searchTerm={searchTerm} />;
+      case 'analytics':
+        return <ServiceAnalyticsDashboard darkMode={darkMode} />;
       case 'settings':
         return <CRMSettings darkMode={darkMode} />;
       default:
